@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ASCII Café</title>
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --cafe:#382417;--caramelo:#6D3C1C;--miel:#C57938;--vainilla:#E7C196;
+  --bg:#F4E9DB;--header:#F8F1E7;--card:#FAF4EA;--text:#382417;--muted:#7A5A43;
+  --line:#E3C9A6;--btn-bg:#F4E9DB;--btn-text:#382417;--on-accent:#FBF3E6;
+  --art-bg:#5F4E43;--art-text:#F3E6D3;--err:#A63A22;--ok:#4F6B2A;
+  --serif:"Playfair Display",Georgia,"Times New Roman",serif;
+  --sans:Montserrat,"Segoe UI",Roboto,system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#1B110B;--header:#241811;--card:#2B1D14;--text:#F1E3CF;--muted:#C9A987;
+    --line:#4A3322;--btn-bg:#241811;--btn-text:#F1E3CF;--on-accent:#1B110B;
+    --art-bg:#120B07;--art-text:#E7C196;--err:#FF9C80;--ok:#B5D58A;
+    --caramelo:#C57938;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1B110B;--header:#241811;--card:#2B1D14;--text:#F1E3CF;--muted:#C9A987;
+  --line:#4A3322;--btn-bg:#241811;--btn-text:#F1E3CF;--on-accent:#1B110B;
+  --art-bg:#120B07;--art-text:#E7C196;--err:#FF9C80;--ok:#B5D58A;
+  --caramelo:#C57938;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.5;min-height:100vh}
+.app{max-width:640px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;background:var(--bg)}
+header{background:var(--header);padding:14px 18px 0}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:12px;font-family:var(--serif);font-weight:800;font-size:1.55rem;letter-spacing:.01em;margin:0}
+.brand .logo{font-size:1.5rem;font-family:var(--sans)}
+.brand em{font-style:normal;color:var(--miel)}
+#theme{display:inline-flex;align-items:center;gap:6px;background:var(--header);color:var(--text);border:2px solid var(--vainilla);border-radius:999px;padding:7px 16px;font:600 .85rem var(--sans);cursor:pointer}
+nav{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;margin-top:10px;border-bottom:2px solid var(--vainilla);margin-left:-18px;margin-right:-18px;padding:0 18px}
+nav button{flex:none;background:none;border:0;border-bottom:3px solid transparent;margin-bottom:-2px;color:var(--text);padding:12px 10px;font:500 .95rem var(--sans);cursor:pointer;opacity:.85}
+nav button[aria-selected="true"]{font-weight:700;opacity:1;border-bottom-color:var(--caramelo)}
+main{flex:1;padding:22px 18px 10px}
+section{display:none}
+section.on{display:block}
+h2{font-family:var(--serif);font-weight:800;font-size:1.65rem;margin:0 0 6px;line-height:1.2}
+.lead{margin:0 0 18px;color:var(--muted);font-size:.98rem}
+.card{background:var(--card);border:2px solid var(--vainilla);border-radius:22px;padding:20px;margin-bottom:18px}
+.card h2{font-size:1.5rem}
+label,.lbl{display:block;font-weight:700;font-size:.98rem;margin:0 0 8px}
+textarea,input[type=text]{width:100%;background:var(--bg);color:var(--text);border:2px solid var(--vainilla);border-radius:14px;padding:12px 14px;font:500 1rem var(--sans)}
+textarea{min-height:96px;resize:vertical}
+textarea::placeholder,input::placeholder{color:var(--muted);opacity:.8}
+.hint{font-size:.8rem;color:var(--muted);margin:14px 0 14px}
+#chars{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}
+#chars button{min-width:64px;height:46px;border-radius:14px;border:2px solid var(--vainilla);background:var(--btn-bg);color:var(--btn-text);font:700 1.05rem var(--sans);cursor:pointer;padding:0 14px}
+#chars button[aria-pressed="true"]{background:var(--caramelo);border-color:var(--caramelo);color:var(--on-accent)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+#other{text-align:center;height:50px}
+.seg{display:flex;height:50px;border:2px solid var(--vainilla);border-radius:14px;overflow:hidden;background:var(--btn-bg)}
+.seg button{flex:1;border:0;background:transparent;color:var(--btn-text);font:700 .9rem var(--sans);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--caramelo);color:var(--on-accent)}
+.actions{display:grid;grid-template-columns:1.7fr 1fr;gap:12px}
+.btn{height:50px;border-radius:14px;border:2px solid var(--vainilla);background:var(--btn-bg);color:var(--btn-text);font:700 1rem var(--sans);cursor:pointer;padding:0 16px}
+.btn.main{background:var(--caramelo);border-color:var(--caramelo);color:var(--on-accent)}
+.res-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.res-btns{display:flex;flex-wrap:wrap;gap:8px}
+.res-head h2{margin:0}
+.res-head .btn{height:46px;font-size:.95rem}
+#out{margin:0;background:var(--art-bg);color:var(--art-text);border-radius:16px;min-height:150px;padding:16px;overflow:auto;font:14px/1.05 ui-monospace,Menlo,Consolas,"Courier New",monospace;white-space:pre;display:block}
+#out.empty{display:flex;align-items:center;justify-content:center;text-align:center;white-space:normal;font:500 .95rem var(--sans);line-height:1.4}
+#out.error{color:#FFC7B5}
+#letters{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:8px;margin-bottom:18px}
+#letters button{height:44px;border-radius:12px;border:2px solid var(--vainilla);background:var(--btn-bg);color:var(--btn-text);font:700 1rem var(--sans);cursor:pointer;padding:0}
+#letters button[aria-pressed="true"]{background:var(--caramelo);border-color:var(--caramelo);color:var(--on-accent)}
+#lout{margin:0;background:var(--art-bg);color:var(--art-text);border-radius:16px;min-height:150px;padding:16px;overflow:auto;font:18px/1.1 ui-monospace,Menlo,Consolas,"Courier New",monospace;white-space:pre;display:block;text-align:center}
+#lout.empty{display:flex;align-items:center;justify-content:center;white-space:normal;font:500 .95rem var(--sans);line-height:1.4}
+#linfo{width:100%;border-collapse:collapse;margin-top:14px;font-size:.92rem}
+#linfo th,#linfo td{border:2px solid var(--vainilla);padding:8px 10px;text-align:left}
+#linfo th{width:46%;font-weight:700}
+#linfo td{font-family:ui-monospace,Menlo,Consolas,"Courier New",monospace}
+#msg{min-height:1.3em;margin:12px 0 0;font-size:.85rem}
+#msg.err{color:var(--err)}#msg.ok{color:var(--ok)}
+ol{margin:0 0 14px;padding-left:22px}
+ol li,ul li{margin:8px 0}
+.small{font-size:.85rem;color:var(--muted);margin:0}
+ul{padding-left:22px;margin:14px 0 0}
+p{margin:0 0 12px}
+footer{padding:22px 18px 26px;text-align:center;font-size:.82rem;color:var(--muted)}
+button:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid var(--miel);outline-offset:2px}
+@media (max-width:380px){.two{grid-template-columns:1fr}.brand{font-size:1.3rem}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="top">
+    <h1 class="brand"><span class="logo" aria-hidden="true">☕</span><span>ASCII <em>Café</em></span></h1>
+    <button id="theme" type="button" aria-label="Cambiar tema"><span id="themeIco" aria-hidden="true">🌙</span><span id="themeTxt">Oscuro</span></button>
+  </div>
+  <nav role="tablist" aria-label="Menú principal">
+    <button role="tab" data-v="gen" aria-selected="true">Generador</button>
+    <button role="tab" data-v="letras" aria-selected="false">Letras</button>
+    <button role="tab" data-v="guia" aria-selected="false">Guía</button>
+    <button role="tab" data-v="about" aria-selected="false">Acerca de</button>
+  </nav>
+</header>
+
+<main>
+  <section id="gen" class="on" role="tabpanel">
+    <h2>Generador de arte ASCII</h2>
+    <p class="lead">Escribe un texto, elige el carácter y conviértelo en letras grandes.</p>
+
+    <div class="card">
+      <label for="txt">Texto de entrada</label>
+      <textarea id="txt" placeholder="Ej: HOLA" autocomplete="off" spellcheck="false"></textarea>
+      <p class="hint">Letras A–Z, números y los signos ! ? . - Cada línea se genera por separado.</p>
+
+      <span class="lbl" id="lblChars">Selector de caracteres</span>
+      <div id="chars" role="group" aria-labelledby="lblChars"></div>
+
+      <div class="two">
+        <div>
+          <label for="other">Otro carácter</label>
+          <input id="other" type="text" maxlength="2" placeholder="♥" autocomplete="off">
+        </div>
+        <div>
+          <span class="lbl" id="lblW">Ancho</span>
+          <div class="seg" role="group" aria-labelledby="lblW">
+            <button type="button" data-w="1" aria-pressed="false">Normal</button>
+            <button type="button" data-w="2" aria-pressed="true">Ancho</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn main" id="bGen" type="button">Generar</button>
+        <button class="btn" id="bClr" type="button">Limpiar</button>
+      </div>
+      <div id="msg" role="status"></div>
+    </div>
+
+    <div class="card">
+      <div class="res-head">
+        <h2>Resultado</h2>
+        <div class="res-btns">
+          <button class="btn" id="bCopy" type="button">Copiar resultado</button>
+          <button class="btn" id="bCsv" type="button">Exportar CSV</button>
+        </div>
+      </div>
+      <pre id="out" class="empty" aria-live="polite">Tu arte ASCII aparecerá aquí.</pre>
+    </div>
+  </section>
+
+  <section id="letras" role="tabpanel">
+    <h2>Explorador de letras</h2>
+    <p class="lead">Selecciona una letra y observa su representación como figura o como número.</p>
+
+    <div class="card">
+      <span class="lbl" id="lblLetters">Selecciona una letra</span>
+      <div id="letters" role="group" aria-labelledby="lblLetters"></div>
+
+      <span class="lbl" id="lblMode">Ver como</span>
+      <div class="seg" id="lmode" role="group" aria-labelledby="lblMode" style="margin-bottom:18px">
+        <button type="button" data-m="fig" aria-pressed="true">Figura</button>
+        <button type="button" data-m="num" aria-pressed="false">Número</button>
+      </div>
+
+      <pre id="lout" class="empty" aria-live="polite">Selecciona una letra para ver su representación.</pre>
+      <table id="linfo" hidden>
+        <tbody>
+          <tr><th scope="row">Carácter</th><td id="iChar"></td></tr>
+          <tr><th scope="row">Código ASCII (decimal)</th><td id="iDec"></td></tr>
+          <tr><th scope="row">Hexadecimal</th><td id="iHex"></td></tr>
+          <tr><th scope="row">Binario (8 bits)</th><td id="iBin"></td></tr>
+          <tr><th scope="row">Puntos encendidos (5×7)</th><td id="iDots"></td></tr>
+        </tbody>
+      </table>
+      <p class="small" style="margin-top:12px">En modo Número, cada 1 es un punto encendido y cada 0 un punto apagado de la fuente 5×7. La figura usa el carácter elegido en el Generador.</p>
+    </div>
+  </section>
+
+  <section id="guia" role="tabpanel">
+    <div class="card">
+      <h2>Guía rápida</h2>
+      <ol>
+        <li>Escribe tu texto en el campo de entrada.</li>
+        <li>Elige un carácter de relleno o escribe el tuyo.</li>
+        <li>Pulsa <b>Generar</b> para ver el arte ASCII.</li>
+        <li>Usa <b>Copiar resultado</b> para llevarlo a tu portapapeles, <b>Exportar CSV</b> para guardarlo como tabla o <b>Limpiar</b> para empezar de nuevo.</li>
+        <li>En <b>Letras</b>, selecciona una letra para ver su figura o su representación en números (matriz de puntos y código ASCII).</li>
+      </ol>
+      <p class="small">Atajo: Ctrl + Enter genera el arte desde el campo de texto. Las tildes se convierten a su letra base.</p>
+    </div>
+  </section>
+
+  <section id="about" role="tabpanel">
+    <div class="card">
+      <h2>Acerca de</h2>
+      <p>ASCII Café transforma texto en letras grandes usando una fuente de puntos de 5×7 y el carácter que elijas. Funciona en el navegador, sin conexión a ningún servidor, y se adapta a móvil, tableta y escritorio.</p>
+      <ul>
+        <li>Explorador de letras con su representación como figura o como número.</li>
+        <li>Exportación del resultado en formato CSV.</li>
+        <li>Modo claro por defecto y modo oscuro opcional.</li>
+        <li>Paleta: Café Intenso, Caramelo tostado, Miel y Vainilla.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer>ASCII Café · Hecho con HTML, CSS y JavaScript</footer>
+</div>
+
+<script>
+const RAW={
+A:".###./#...#/#...#/#####/#...#/#...#/#...#",B:"####./#...#/#...#/####./#...#/#...#/####.",
+C:".###./#...#/#..../#..../#..../#...#/.###.",D:"####./#...#/#...#/#...#/#...#/#...#/####.",
+E:"#####/#..../#..../####./#..../#..../#####",F:"#####/#..../#..../####./#..../#..../#....",
+G:".###./#...#/#..../#.###/#...#/#...#/.###.",H:"#...#/#...#/#...#/#####/#...#/#...#/#...#",
+I:".###./..#../..#../..#../..#../..#../.###.",J:"..###/...#./...#./...#./...#./#..#./.##..",
+K:"#...#/#..#./#.#../##.../#.#../#..#./#...#",L:"#..../#..../#..../#..../#..../#..../#####",
+M:"#...#/##.##/#.#.#/#.#.#/#...#/#...#/#...#",N:"#...#/##..#/##..#/#.#.#/#..##/#..##/#...#",
+O:".###./#...#/#...#/#...#/#...#/#...#/.###.",P:"####./#...#/#...#/####./#..../#..../#....",
+Q:".###./#...#/#...#/#...#/#.#.#/#..#./.##.#",R:"####./#...#/#...#/####./#.#../#..#./#...#",
+S:".####/#..../#..../.###./....#/....#/####.",T:"#####/..#../..#../..#../..#../..#../..#..",
+U:"#...#/#...#/#...#/#...#/#...#/#...#/.###.",V:"#...#/#...#/#...#/#...#/#...#/.#.#./..#..",
+W:"#...#/#...#/#...#/#.#.#/#.#.#/##.##/#...#",X:"#...#/#...#/.#.#./..#../.#.#./#...#/#...#",
+Y:"#...#/#...#/.#.#./..#../..#../..#../..#..",Z:"#####/....#/...#./..#../.#.../#..../#####",
+"0":".###./#...#/#..##/#.#.#/##..#/#...#/.###.","1":"..#../.##../..#../..#../..#../..#../.###.",
+"2":".###./#...#/....#/...#./..#../.#.../#####","3":"####./....#/....#/.###./....#/....#/####.",
+"4":"...#./..##./.#.#./#..#./#####/...#./...#.","5":"#####/#..../####./....#/....#/#...#/.###.",
+"6":".###./#..../#..../####./#...#/#...#/.###.","7":"#####/....#/...#./..#../.#.../.#.../.#...",
+"8":".###./#...#/#...#/.###./#...#/#...#/.###.","9":".###./#...#/#...#/.####/....#/....#/.###.",
+"!":"..#../..#../..#../..#../..#../...../..#..","?":".###./#...#/....#/...#./..#../...../..#..",
+".":"...../...../...../...../...../.##../.##..","-":"...../...../...../#####/...../...../....."
+};
+const FONT={};for(const k in RAW)FONT[k]=RAW[k].split("/");
+
+const $=id=>document.getElementById(id);
+const txt=$("txt"),out=$("out"),msg=$("msg"),other=$("other");
+const PRESETS=["█","#","@","*","•","+","$","▒"];
+let fill="█",scale=2,last=null;
+
+function say(t,ok){msg.textContent=t;msg.className=t?(ok?"ok":"err"):"";}
+function setOut(t,kind){out.textContent=t;out.className=kind||"";}
+function emptyOut(){setOut("Tu arte ASCII aparecerá aquí.","empty");last=null;}
+function normalize(s){return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase();}
+function firstChar(s){return Array.from(s)[0]||"";}
+function activeFill(){const o=firstChar(other.value.trim());return o||fill;}
+
+function renderLine(line,ch,w){
+  const rows=["","","","","","",""],pad=" ".repeat(w);
+  for(const c of line){
+    if(c===" "){for(let r=0;r<7;r++)rows[r]+=" ".repeat(5*w+w);continue;}
+    for(let r=0;r<7;r++){
+      let s="";for(const px of FONT[c][r])s+=px==="#"?ch.repeat(w):pad;
+      rows[r]+=s+pad;
+    }
+  }
+  return rows.map(r=>r.replace(/\s+$/,"")).join("\n");
+}
+function generate(){
+  const raw=txt.value;
+  if(!raw.trim()){emptyOut();say("Escribe un texto para generar el arte.",false);return;}
+  const lines=normalize(raw).split(/\r?\n/);
+  const bad=[...new Set(lines.join("").split("").filter(c=>c!==" "&&!FONT[c]))];
+  if(bad.length){last=null;setOut("Carácter no válido: "+bad.join(" ")+"\nUsa letras A–Z, números y los signos ! ? . -","error");say("Hay caracteres que no se pueden dibujar.",false);return;}
+  const ch=activeFill(),blocks=lines.filter(l=>l.trim()).map(l=>renderLine(l,ch,scale));
+  setOut(blocks.join("\n\n"));say("Arte generado.",true);
+  last={lines:lines.filter(l=>l.trim()),blocks,ch,w:scale};
+}
+PRESETS.forEach(c=>{
+  const b=document.createElement("button");b.type="button";b.textContent=c;b.setAttribute("aria-pressed",c===fill);b.setAttribute("aria-label","Relleno "+c);
+  b.onclick=()=>{fill=c;other.value="";document.querySelectorAll("#chars button").forEach(x=>x.setAttribute("aria-pressed",x===b));};
+  $("chars").appendChild(b);
+});
+other.addEventListener("input",()=>{if(other.value.trim())document.querySelectorAll("#chars button").forEach(x=>x.setAttribute("aria-pressed","false"));
+  else document.querySelectorAll("#chars button").forEach(x=>x.setAttribute("aria-pressed",x.textContent===fill));});
+document.querySelectorAll(".seg button[data-w]").forEach(b=>b.onclick=()=>{
+  scale=+b.dataset.w;document.querySelectorAll(".seg button[data-w]").forEach(x=>x.setAttribute("aria-pressed",x===b));});
+$("bGen").onclick=generate;
+txt.addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();generate();}});
+$("bClr").onclick=()=>{txt.value="";other.value="";emptyOut();say("",true);
+  document.querySelectorAll("#chars button").forEach(x=>x.setAttribute("aria-pressed",x.textContent===fill));txt.focus();};
+
+async function copyText(t){
+  if(window.AndroidBridge){try{AndroidBridge.copy(t);return true;}catch(e){}}
+  try{await navigator.clipboard.writeText(t);return true;}catch(e){}
+  try{const a=document.createElement("textarea");a.value=t;a.style.cssText="position:fixed;opacity:0";document.body.appendChild(a);a.select();const ok=document.execCommand("copy");a.remove();return ok;}catch(e){return false;}
+}
+$("bCopy").onclick=async()=>{
+  if(out.classList.contains("empty")||out.classList.contains("error")||!out.textContent.trim()){say("Genera un arte antes de copiar.",false);return;}
+  const ok=await copyText(out.textContent);
+  say(ok?"Resultado copiado.":"No se pudo copiar; selecciona el texto manualmente.",ok);
+};
+
+function csvField(v){v=String(v);if(/^[=+\-@]/.test(v))v="'"+v;return '"'+v.replace(/"/g,'""')+'"';}
+function toCSV(g){
+  const rows=[["bloque","texto","relleno","ancho","fila","contenido"]];
+  g.blocks.forEach((b,i)=>b.split("\n").forEach((r,j)=>rows.push([i+1,g.lines[i].trim(),g.ch,g.w===1?"Normal":"Ancho",j+1,r])));
+  return "\uFEFF"+rows.map(r=>r.map(csvField).join(",")).join("\r\n")+"\r\n";
+}
+$("bCsv").onclick=async()=>{
+  if(!last){say("Genera un arte antes de exportar.",false);return;}
+  const csv=toCSV(last);
+  if(window.AndroidBridge&&typeof AndroidBridge.share==="function"){
+    try{AndroidBridge.share(csv);say("CSV listo para compartir o guardar.",true);return;}catch(e){}
+  }
+  if(!window.AndroidBridge){
+    try{const u=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
+      const a=document.createElement("a");a.href=u;a.download="arte-ascii.csv";document.body.appendChild(a);a.click();a.remove();
+      setTimeout(()=>URL.revokeObjectURL(u),1000);say("CSV descargado: arte-ascii.csv",true);return;}catch(e){}
+  }
+  const ok=await copyText(csv);
+  say(ok?"CSV copiado al portapapeles.":"No se pudo exportar el CSV.",ok);
+};
+
+let letter=null,lmode="fig";
+function showLetter(){
+  const lout=$("lout");
+  if(!letter){lout.textContent="Selecciona una letra para ver su representación.";lout.className="empty";$("linfo").hidden=true;return;}
+  const g=FONT[letter],ch=activeFill();
+  lout.className="";
+  lout.textContent=lmode==="fig"?renderLine(letter,ch,2):g.map(r=>r.split("").map(px=>px==="#"?"1":"0").join(" ")).join("\n");
+  const code=letter.charCodeAt(0);
+  $("iChar").textContent=letter;$("iDec").textContent=code;
+  $("iHex").textContent="0x"+code.toString(16).toUpperCase();
+  $("iBin").textContent=code.toString(2).padStart(8,"0");
+  $("iDots").textContent=g.join("").split("").filter(px=>px==="#").length+" de 35";
+  $("linfo").hidden=false;
+}
+Array.from("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?.-").forEach(k=>{
+  const b=document.createElement("button");b.type="button";b.textContent=k;b.setAttribute("aria-pressed","false");b.setAttribute("aria-label","Letra "+k);
+  b.onclick=()=>{letter=k;document.querySelectorAll("#letters button").forEach(x=>x.setAttribute("aria-pressed",x===b));showLetter();};
+  $("letters").appendChild(b);
+});
+document.querySelectorAll("#lmode button").forEach(b=>b.onclick=()=>{
+  lmode=b.dataset.m;document.querySelectorAll("#lmode button").forEach(x=>x.setAttribute("aria-pressed",x===b));showLetter();});
+
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("nav button").forEach(x=>x.setAttribute("aria-selected",x===b));
+  document.querySelectorAll("section").forEach(s=>s.classList.toggle("on",s.id===b.dataset.v));
+  if(b.dataset.v==="letras")showLetter();
+  window.scrollTo(0,0);
+});
+
+const root=document.documentElement;
+function isDark(){const t=root.getAttribute("data-theme");return t?t==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;}
+function paintTheme(){const d=isDark();$("themeIco").textContent=d?"☀️":"🌙";$("themeTxt").textContent=d?"Claro":"Oscuro";}
+$("theme").onclick=()=>{const n=isDark()?"light":"dark";root.setAttribute("data-theme",n);try{localStorage.setItem("ascii-cafe-theme",n);}catch(e){}paintTheme();};
+// Claro por defecto; solo se respeta una elección guardada por la persona
+root.setAttribute("data-theme","light");
+try{const s=localStorage.getItem("ascii-cafe-theme");if(s==="dark"||s==="light")root.setAttribute("data-theme",s);}catch(e){}
+paintTheme();
+</script>
+</body>
+</html>
